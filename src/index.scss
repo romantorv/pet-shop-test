@@ -1,0 +1,17 @@
+@import '~bootstrap/scss/functions';
+@import '~bootstrap/scss/variables';
+
+$font-highlight-family: Work Sans, #{$font-family-sans-serif};
+$font-base: Roboto, Helvetica Neue, Arial, Noto Sans, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
+
+/****** TYPES *******/
+body {
+	font-family: $font-base;
+}
+
+@for $index from 1 to 6 {
+	h#{$index},
+	.h#{$index} {
+		font-family: $font-highlight-family;
+	}
+}

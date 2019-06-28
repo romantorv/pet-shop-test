@@ -1,4 +1,8 @@
 import React from 'react';
+
+import { 
+  withLayout
+} from 'components';
 import './App.css';
 
 function App() {
@@ -9,4 +13,4 @@ function App() {
   );
 }
 
-export default App;
+export default withLayout(App);
