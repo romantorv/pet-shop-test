@@ -4,10 +4,12 @@ import * as AppConfig from 'app.config';
 
 import Actions from './Actions';
 import OwnerModel from './models/OwnerModel';
+import PetModel from './models/PetModel';
 
 const Store = types
 	.model('Store', {
 		owners: types.array( OwnerModel, []),
+		pets: types.array(PetModel, []),
 		state: types.enumeration('States', ['initial', 'loading', 'completed', 'fetching', 'error']),
 		stateTarget: '',
 		stateMessage: '',
@@ -15,7 +17,14 @@ const Store = types
 	.views( self => ({
 		get __ready(){
 			return self.state !== 'initial' && self.state !== 'loading';
+		},
+		__getPetsBy(){
+
+		},
+		__getOwnersBy(){
+			
 		}
+		
 	}))
 	.actions( self => ({
 		...Actions,
@@ -31,11 +40,9 @@ const Store = types
 				self.state = 'completed';
 				return null;
 			} catch (error) {
-				// const { response } = error;
-				console.log( error );
 				self.state = 'error';
 				self.stateTarget = 'page';
-				// self.stateMessage = response.message;
+				self.stateMessage = error.message || 'Error while fetching records';
 				throw error;
 			}
 		})

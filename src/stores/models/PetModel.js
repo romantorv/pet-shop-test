@@ -3,7 +3,8 @@ import { types } from 'mobx-state-tree';
 const PetModel = types
 	.model('PetModel', {
 		type: types.string,
-		name: types.string
+		name: types.string,
+		ownerGender: types.enumeration('Gender', ['Male', 'Female']),
 	})
 	.views( self => ({
 		get __avatar(){
