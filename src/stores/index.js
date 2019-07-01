@@ -1,15 +1,14 @@
-import { types, flow } from 'mobx-state-tree';
+import { types, flow, getSnapshot } from 'mobx-state-tree';
 
 import * as AppConfig from 'app.config';
 
 import Actions from './Actions';
 import OwnerModel from './models/OwnerModel';
-import PetModel from './models/PetModel';
 
 const Store = types
 	.model('Store', {
 		owners: types.array( OwnerModel, []),
-		pets: types.array(PetModel, []),
+		petTypes: types.optional( types.frozen(), {}),
 		state: types.enumeration('States', ['initial', 'loading', 'completed', 'fetching', 'error']),
 		stateTarget: '',
 		stateMessage: '',
@@ -18,11 +17,37 @@ const Store = types
 		get __ready(){
 			return self.state !== 'initial' && self.state !== 'loading';
 		},
-		__getPetsBy(){
-
+		get __genderList(){
+			return [
+				{ label: 'Male', value: 'Male' },
+				{ label: 'Female', value:'Female' }
+			];
 		},
-		__getOwnersBy(){
+		get __petTypeList(){
+			return Object.keys(self.petTypes).reduce( (result, item) => {
+				result.push({label: item, value: item});
+				return result;
+			}, []);
+		},
+		__getPetsBy(query){
+			let ownerGender=null, type=null;
+			if ( typeof query !== 'undefined') {
+				ownerGender = typeof query.ownerGender !== 'undefined' ? query.ownerGender : null;
+				type = typeof query.type !== 'undefined' ? query.type : null;
+			}
 			
+			return self.owners.reduce( (result, person) => {
+				if ( (ownerGender !== null && person.gender === ownerGender) || ownerGender === null ){
+					let newResult = [];
+					newResult = result.concat( person.__getPetsByType(type) );
+					return newResult;
+				} 
+				return result;
+			}, []);
+		},
+		__getOwnersBy(query){
+			if ( typeof query === 'undefined' || typeof query.ownerGender === 'undefined' ) return self.owners;
+			return self.owners.filter( person => person.gender === query.ownerGender );
 		}
 		
 	}))
@@ -36,7 +61,13 @@ const Store = types
 					cancelToken: params && typeof params.cancelToken !== 'undefined' ? params.cancelToken : null,
 				});
 				
-				result.map( item => self.owners.push( OwnerModel.create(item) ) );
+				// console.log( 'fetching', result );
+				result.map( item => {
+					const ownersInstance = OwnerModel.create(item);
+					self.owners.push( ownersInstance );
+					self.petTypes = ownersInstance.retrievePetTypeList( getSnapshot(self).petTypes );
+					return null;
+				});
 				self.state = 'completed';
 				return null;
 			} catch (error) {

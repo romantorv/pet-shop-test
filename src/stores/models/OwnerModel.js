@@ -44,6 +44,16 @@ const OwnerModel = types
 			if ( type === undefined || type === null ) return self.pets;
 			return self.pets.filter( pet => pet.type.toLowerCase() === type.toLowerCase() );
 		}
+	}))
+	.actions( self => ({
+		retrievePetTypeList(existedObj={}){
+			if ( self.pets === null ) return {...existedObj};
+			//
+			const petObj = { ...existedObj };
+			self.pets.map( item => petObj[item.type] = true);
+			//
+			return petObj;
+		}
 	}));
 
 export default OwnerModel;

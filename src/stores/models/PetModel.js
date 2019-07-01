@@ -4,7 +4,6 @@ const PetModel = types
 	.model('PetModel', {
 		type: types.string,
 		name: types.string,
-		ownerGender: types.enumeration('Gender', ['Male', 'Female']),
 	})
 	.views( self => ({
 		get __avatar(){
@@ -18,6 +17,13 @@ const PetModel = types
 				default:
 					return '🦖Hmm...';
 			}
+		}
+	}))
+	.actions( self => ({
+		afterCreate(){
+			//converting pet type
+			let lowercasename = self.type.toLowerCase();
+			self.type = lowercasename.charAt(0).toUpperCase() + lowercasename.slice(1);
 		}
 	}));
 
