@@ -96,6 +96,10 @@ describe('Checking root store: returning correct data', () => {
 		expect( store.__getPetsBy() ).toEqual(
 			expect.arrayContaining(petData)
 		);
+		expect( store.__getPetsBy()[0] ).toEqual(petData[1]);
+		expect( store.__getPetsBy()[1] ).toEqual(petData[2]);
+		expect( store.__getPetsBy()[2] ).toEqual(petData[0]);
+
 	});
 
 	it('successfully return list of "CATs"', () => {

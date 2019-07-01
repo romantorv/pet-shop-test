@@ -36,7 +36,7 @@ const Store = types
 				type = typeof query.type !== 'undefined' ? query.type : null;
 			}
 			
-			return self.owners.reduce( (result, person) => {
+			let unsorted =  self.owners.reduce( (result, person) => {
 				if ( (ownerGender !== null && person.gender === ownerGender) || ownerGender === null ){
 					let newResult = [];
 					newResult = result.concat( person.__getPetsByType(type) );
@@ -44,6 +44,8 @@ const Store = types
 				} 
 				return result;
 			}, []);
+
+			return unsorted.sort( (a,b) => a.name > b.name );
 		},
 		__getOwnersBy(query){
 			if ( typeof query === 'undefined' || typeof query.ownerGender === 'undefined' ) return self.owners;
