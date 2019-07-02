@@ -56,8 +56,7 @@ export default PetModel;
 ```
 
 ### Store:
-Contains many model and complex logic, this will perform all actions that designed for the components / functions
-A Sample Store
+Contains many model and complex logic, this will perform all actions that designed for the components / module or root store
 
 ```javascript
 import { types, flow, getSnapshot } from 'mobx-state-tree';
