@@ -1,6 +1,6 @@
 import { types, flow, getSnapshot } from 'mobx-state-tree';
 
-import * as AppConfig from 'app.config';
+// import * as AppConfig from 'app.config';
 
 import Actions from './Actions';
 import OwnerModel from './models/OwnerModel';
@@ -119,7 +119,7 @@ const Store = types
 				ownerGender = typeof query.ownerGender !== 'undefined' ? query.ownerGender : null;
 				type = typeof query.type !== 'undefined' ? query.type : null;
 			}
-
+			
 			let unsorted = self.owners.reduce((result, person) => {
 				if ((ownerGender !== null && person.gender === ownerGender) || ownerGender === null) {
 					let newResult = [];
@@ -128,7 +128,6 @@ const Store = types
 				}
 				return result;
 			}, []);
-
 			return unsorted.sort((a, b) => a.name > b.name);
 		},
 		__getOwnersBy(query) {
@@ -147,13 +146,14 @@ const Store = types
 				// 	cancelToken: params && typeof params.cancelToken !== 'undefined' ? params.cancelToken : null,
 				// });
 				const result = yield Promise.resolve(fakeData);
-				// console.log( 'fetching', result );
+				
 				result.map(item => {
 					const ownersInstance = OwnerModel.create(item);
-					self.owners.push(ownersInstance);
+					self.owners.push(ownersInstance.toJSON());
 					self.petTypes = ownersInstance.retrievePetTypeList(getSnapshot(self).petTypes);
 					return null;
 				});
+
 				self.state = 'completed';
 				return null;
 			} catch (error) {

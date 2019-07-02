@@ -1,4 +1,4 @@
-import { types } from 'mobx-state-tree';
+import { types, getParent } from 'mobx-state-tree';
 
 const PetModel = types
 	.model('PetModel', {
@@ -17,6 +17,20 @@ const PetModel = types
 				default:
 					return '🦖Hmm...';
 			}
+		},
+		get __owner(){
+			const {
+				__avatar,
+				name,
+				age,
+				gender
+			} = getParent(self, 2);
+			return {
+				__avatar,
+				name,
+				age,
+				gender
+			};
 		}
 	}))
 	.actions( self => ({

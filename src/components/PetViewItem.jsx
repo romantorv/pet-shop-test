@@ -44,12 +44,12 @@ class PetViewItem extends React.PureComponent {
 
 PetViewItem.propTypes = {
 	ready: PropTypes.bool,
-	data: PropTypes.objectOf({
+	data: PropTypes.shape({
 		__avatar: PropTypes.string,
 		type: PropTypes.string.isRequired,
 		name: PropTypes.string.isRequired,
 	}).isRequired,
-	ownerData: PropTypes.objectOf({
+	ownerData: PropTypes.shape({
 		__avatar: PropTypes.string,
 		name: PropTypes.string.isRequired,
 		age: PropTypes.number,

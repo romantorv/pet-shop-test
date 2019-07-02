@@ -37,7 +37,7 @@ body {
 
 		>li {
 			@include make-col-ready();
-			margin-bottom: 1rem;
+			margin-bottom: 1.75rem;
 
 			@include media-breakpoint-up(md){
 				@include make-col(6);
