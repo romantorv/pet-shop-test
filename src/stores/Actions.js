@@ -1,6 +1,8 @@
 import { flow } from 'mobx-state-tree';
 import axios from 'axios';
 
+import * as debug from 'utils/DebugTool';
+
 export default {
 	fetch: flow( function* fetch({
 		method='GET',
@@ -15,10 +17,11 @@ export default {
 				cancelToken,
 				auth,
 			});
+			debug.store(`Successfully '${method}' from ${url}`);
 			return response.data;
 		} catch (error) {
-			// debug.store(endPoint, error.response);
-			throw error.response && error.response.data ? error.response.data : error;
+			debug.store(`error fetching ${url}`, error.response );
+			throw error.response ? error.response : new Error('There is error while fetching');
 		}
 	})
 }

@@ -1,68 +1,123 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# Pactera's Pet shop mock test
 
-## Available Scripts
+This is the app architecture that present the preparation when we start a project. This information will help all developers understand the overall concept and start building a highly scalable product.
 
-In the project directory, you can run:
+## Index
 
-### `npm start`
+1.	Document structure
+2.	Naming convention for stores / models
+3.	Debugger mode for all environments
+4.	Built configuration for different environments
+5.	Unit test and E2E test
 
-Runs the app in the development mode.<br>
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
-The page will reload if you make edits.<br>
-You will also see any lint errors in the console.
+## Document Structure
 
-### `npm test`
+We start build the big application from small modules and smaller components, by designing as below structure, we can make it scalable, easily for parallelly development and testing:
 
-Launches the test runner in the interactive watch mode.<br>
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### app.config
+The app.config.js contains site settings/configuration, constant name at the app level
 
-### `npm run build`
+### App /index.js
+The index.js acts like the entry point for the app or module, it’s useful when we want to integrate and use the module without further settings.
 
-Builds the app for production to the `build` folder.<br>
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### .JS vs .JSX
+We need to define the content type from its name:
+- by using JS, this file contains the business logics and integration
+- by using JSX, we have templating inside and the return is mostly a React Component type.
 
-The build is minified and the filenames include the hashes.<br>
-Your app is ready to be deployed!
+## Naming convention for stores / models
+When working with stores and models, we should have a standard communication for properties, methods and computed attributes. Following the guideline will help we talk less for the usage / purpose.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### Model:
+This is the lowest unit of a store, a good model design should not contain other model. A Model can have the many computed attributes and actions that related to itself. A model code is likely:
 
-### `npm run eject`
+```javascript
+import { types } from 'mobx-state-tree';
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+const PetModel = types
+	.model('PetModel', {
+		type: types.string,
+		name: types.string,
+	})
+	.views( self => ({
+		get __avatar(){
+			...
+		},
+	}))
+	.actions( self => ({
+		afterCreate(){
+			//converting pet type
+			...
+		}
+	}));
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+export default PetModel;
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+### Store:
+Contains many model and complex logic, this will perform all actions that designed for the components / functions
+A Sample Store
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+```javascript
+import { types, flow, getSnapshot } from 'mobx-state-tree';
 
-## Learn More
+import * as AppConfig from 'app.config';
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+import Actions from './Actions';
+import OwnerModel from './models/OwnerModel';
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+const Store = types
+	.model('Store', {
+		owners: types.array(OwnerModel, []),
+		state: types.enumeration('States', ['initial', 'loading', 'completed', 'fetching', 'error']),
+		stateTarget: '',
+		stateMessage: '',
+	})
+	.views(self => ({
+		get __ready() {
+			return self.state !== 'initial' && self.state !== 'loading';
+		},
+		__getPetsBy(query) {
+			...
+		},
+		...
+	}))
+	.actions(self => ({
+		...Actions,
+		fetchOwners: flow(function* fetchOwners(params) {
+			...
+		})
+	}));
 
-### Code Splitting
+export default Store;
+```
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
+### Common Actions:
+A collection of same configuration actions to use with the store. The actions are wrapped with the axios headers configuration, so that we don’t need to declare at each store
 
-### Analyzing the Bundle Size
+Can read the action here: ./stores/actions.js
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
+### Naming convention:
+Store attributes:
+- state: having some basic states: ‘initial’, ‘loading’, ’completed’, ‘fetching’, ‘error’
+- stateTarget: will content the target of state inside the store, mostly used for conditional render inside the template
+Computed attributes:
+- __ready: a signal to let template component knows that the state already completed the initial stage
+- __<name of the objet>: return the object snapshot based on current store attributes, not have any input.
 
-### Making a Progressive Web App
+### Computed methods:
+- __get<name of the object>: using to retrieve the desired content from the current snapshot, the logic inside this method will not change anything to the store attributes.
+-- E.g: __getLabelById(id)
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
+## Debugger mode for all environments
 
-### Advanced Configuration
+For enable the debug mode in all environment, we need to write this value inside the localStorage:
+debug=pactera:*
+Built configuration for different environments
+- <root>/.env => for development environment
+- STAGE or PRODUCTION environment required to set on the VM instance.
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
+## Test-Driven Development
 
-### Deployment
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
-
-### `npm run build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+(on going)
