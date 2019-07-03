@@ -6,7 +6,15 @@ import PetListView from 'components/PetListView';
 
 class Homepage extends React.Component {
 	componentDidMount() {
-		this.props.componentStore.fetchOwners();
+		this.fetchOwners();
+	}
+
+	async fetchOwners(){
+		try {
+			await this.props.componentStore.fetchOwners();
+		} catch (error) {
+			// print error on the screen ui
+		}
 	}
 
 	render() {

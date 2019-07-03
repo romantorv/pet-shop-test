@@ -2,6 +2,8 @@ import 'jest-extended';
 import mockAxios from 'axios';
 import Store from '../index';
 
+import 'debug';
+
 import * as AppConfig from 'app.config';
 
 const petData = [{
@@ -57,11 +59,13 @@ describe('Checking root store: successfully creating store', () => {
 		await store.fetchOwners();
 
 		expect(store.__ready).toBe(true);
-		expect(store.__petTypeList).toEqual([
-			{"label": "Cat", "value": "Cat"},
-			{"label": "Fish", "value": "Fish"},
-			{"label": "Horse", "value": "Horse"}
-		]);
+		expect(store.__petTypeList).toEqual(
+			expect.arrayContaining([
+				{"label": "Cat", "value": "Cat"},
+				{"label": "Fish", "value": "Fish"},
+				{"label": "Horse", "value": "Horse"}
+			])
+		);
 		expect(mockAxios.request).toHaveBeenCalledTimes(1);
 		expect(mockAxios.request).toHaveBeenCalledWith({
 			'auth': null, 
